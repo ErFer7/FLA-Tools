@@ -1,0 +1,13 @@
+S -> aABCX | aBCX | Y
+A -> aABC | aBC
+X -> E | QW | W | QE | WE
+Q -> QQ | R
+W -> WW | B
+E -> CC | C
+BR -> RB
+CR -> RC
+CB -> BC
+R -> a
+B -> b
+C -> c
+Y -> bYc | bY | Yc | bc | b | c

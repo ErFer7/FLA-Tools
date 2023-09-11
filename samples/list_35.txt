@@ -1,0 +1,6 @@
+S -> XY
+X -> aXC | aC
+Y -> BYd | Bd
+CB -> BC
+B -> b
+C -> c

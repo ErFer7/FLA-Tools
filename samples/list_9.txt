@@ -1,0 +1,8 @@
+S -> aX_IPP | bX_PIP | cX_PPI | c
+X_PPI -> aX_IPI | bX_PII | cS
+X_PIP -> aX_IIP | bX_S | cX_PII
+X_PII -> aX_III | bX_PPI | cX_PIP | b
+X_IPP -> aS | bX_IIP | cX_IPI
+X_IPI -> aX_PPI | bX_III | cX_IPP | a
+X_IIP -> aX_PIP | bX_IPP | cX_III
+X_III -> aX_PII | bX_IPI | cX_IIP

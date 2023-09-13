@@ -1,0 +1,8 @@
+S -> aX_1P | bX_0I | cX_1P
+X_1P -> aX_2P | bX_1I | cX_2P
+X_2P -> aX_3P | bX_2I | cX_3P | a | c
+X_3P -> aX_1P | bX_3I | cX_1P
+X_1I -> aX_2I | bX_1P | cX_2I
+X_2I -> aX_3I | bX_2P | cX_3I
+X_3I -> aX_1I | bX_3P | cX_1I | b
+X_0I -> aX_1I | bS | cX_1I

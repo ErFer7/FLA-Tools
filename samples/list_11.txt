@@ -1,0 +1,4 @@
+S -> aA_I | bB_I | a | b
+A_I -> aS | bB_P
+B_P -> aA_I | a
+B_I -> aS

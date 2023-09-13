@@ -1,0 +1,5 @@
+S -> aX_IP | bX_PI | cX_PP | null
+X_II -> aX_PI | bX_IP | cX_II
+X_IP -> aX_PP | bX_II | cX_IP | a
+X_PI -> aX_II | bX_PP | cX_PI | b
+X_PP -> aX_IP | bX_PI | cX_PP

@@ -1,0 +1,3 @@
+S -> aP
+P -> aP | bP | cI | b
+I -> aI | bI | cP

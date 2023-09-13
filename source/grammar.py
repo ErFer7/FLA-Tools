@@ -54,30 +54,70 @@ class Grammar():
 
         return string
 
-    def proccess_step(self, string: str) -> tuple[str, bool]:
+    @property
+    def initial_production_rule(self) -> str:
+        '''
+        Returns the initial production rule.
+        '''
+
+        return self._initial_production_rule
+
+    def derive_random_step(self, string: str) -> tuple[str, bool]:
         '''
         Proccesses a step.
         '''
 
+        possible_rules = []
+
         for left_hand_side in self._production_rules:
             if left_hand_side in string:
-                return (string.replace(left_hand_side, self.derive_step(left_hand_side), 1), False)
+                possible_rules.append(left_hand_side)
+
+        if len(possible_rules) > 0:
+            left_hand_side = choice(possible_rules)
+            return (string.replace(left_hand_side, self.random_replacement(left_hand_side), 1), False)
 
         return (string, True)
 
-    def derive_initial_production_rule(self) -> str:
+    def derive_branching_step(self, string: str) -> tuple[list[str], bool]:
         '''
-        Derives the initial production rule.
+        Proccesses possible steps.
         '''
 
-        return self.derive_step(self._initial_production_rule)
+        possible_rules = []
+        possible_results = []
 
-    def derive_step(self, left_hand_side: str) -> str:
+        for left_hand_side in self._production_rules:
+            if left_hand_side in string:
+                possible_rules.append(left_hand_side)
+
+        if len(possible_rules) == 0:
+            return ([string], True)
+
+        for possible_rule in possible_rules:
+            for possible_replacement in self.all_replacements(possible_rule):
+                possible_results.append(string.replace(possible_rule, possible_replacement, 1))
+
+        return (possible_results, False)
+
+    def random_replacement(self, left_hand_side: str) -> str:
         '''
         Derives a step.
         '''
 
         if left_hand_side in self._production_rules:
-            return choice(self._production_rules[left_hand_side])
+            result = choice(self._production_rules[left_hand_side])
+
+            return result if result != 'null' else ''
+
+        raise KeyError('Invalid left-hand side.')
+
+    def all_replacements(self, left_hand_side: str) -> list[str]:
+        '''
+        Derives all possibilities.
+        '''
+
+        if left_hand_side in self._production_rules:
+            return list(map(lambda x: x if x != 'null' else '', self._production_rules[left_hand_side]))
 
         raise KeyError('Invalid left-hand side.')

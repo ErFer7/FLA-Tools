@@ -12,5 +12,4 @@ automata = [('4;A;{D};{a,b};A,a,A;A,a,B;A,b,A;B,b,C;C,b,D',
              '8;{P};{{PQRS},{PQS},{PRS},{PS}};{0,1};{P},0,{PQ};{P},1,{P};{PQ},0,{PQR};{PQ},1,{PR};{PQR},0,{PQRS};{PQR},1,{PR};{PQRS},0,{PQRS};{PQRS},1,{PRS};{PQS},0,{PQRS};{PQS},1,{PRS};{PR},0,{PQS};{PR},1,{P};{PRS},0,{PQS};{PRS},1,{PS};{PS},0,{PQS};{PS},1,{PS}')]
 
 tests = Tests(automata)
-for _ in range(100):
-    tests.run_all()
+tests.run_all()

@@ -33,10 +33,7 @@ class FiniteAutomaton():
 
         transitions = []
 
-        for transition in self._transitions.items():
-            source, symbol = transition[0]
-            target = transition[1]
-
+        for (source, symbol), target in self._transitions.items():
             for sub_target in target:
                 transitions.append((source, symbol, sub_target))
 
@@ -74,10 +71,7 @@ class FiniteAutomaton():
         Retorna o estado de destino da transição.
         '''
 
-        if (state, symbol) in self._transitions:
-            return self._transitions[(state, symbol)]
-
-        return set()
+        return self._transitions.get((state, symbol), set())
 
     def state_epsilon_closure(self, state: str) -> set[str]:
         '''
@@ -86,8 +80,8 @@ class FiniteAutomaton():
 
         epsilon_closure = {state}
 
-        for state in self.transition(state, '&'):
-            epsilon_closure = epsilon_closure.union(self.state_epsilon_closure(state))
+        for target_state in self.transition(state, '&'):
+            epsilon_closure |= self.state_epsilon_closure(target_state)
 
         return epsilon_closure
 
@@ -96,12 +90,7 @@ class FiniteAutomaton():
         Retorna o épsilon-fecho de todos os estados.
         '''
 
-        epsilon_closure = {}
-
-        for state in self._states:
-            epsilon_closure[state] = self.state_epsilon_closure(state)
-
-        return epsilon_closure
+        return {state: self.state_epsilon_closure(state) for state in self._states}
 
 
 class FiniteAutomatonBuilder():
@@ -127,13 +116,7 @@ class FiniteAutomatonBuilder():
         for line in data[4:]:
             source, symbol, target = line.split(',')
             states = states.union({source, target})
-
-            key = (source, symbol)
-
-            if key not in transitions:
-                transitions[key] = {target}
-            else:
-                transitions[key] = transitions[key].union({target})
+            transitions.setdefault((source, symbol), set()).add(target)
 
         return FiniteAutomaton(states, initial_state, final_states, alphabet, transitions)
 
@@ -151,7 +134,7 @@ class FiniteAutomatonDeterminizer():
         '''
 
         final_states = set()
-        alphabet = [x for x in finite_automaton.alphabet if x != '&']
+        alphabet = {x for x in finite_automaton.alphabet if x != '&'}
         transitions = {}
 
         epsilon_closure = finite_automaton.epsilon_closure()
@@ -185,14 +168,9 @@ class FiniteAutomatonDeterminizer():
                 if target_state not in states:
                     unprocessed_states.append(target_state)
 
-                key = (source, symbol)
+                transitions.setdefault((source, symbol), set()).add(target_state)
 
-                if key not in transitions:
-                    transitions[key] = {target_state}
-                else:
-                    transitions[key] = transitions[key].union({target_state})
-
-                states = states.union({target_state})
+                states |= {target_state}
 
         return FiniteAutomaton(states, initial_state, final_states, alphabet, transitions)
 

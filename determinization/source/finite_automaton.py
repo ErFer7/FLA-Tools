@@ -115,7 +115,7 @@ class FiniteAutomatonBuilder():
 
         for line in data[4:]:
             source, symbol, target = line.split(',')
-            states = states.union({source, target})
+            states |= {source, target}
             transitions.setdefault((source, symbol), set()).add(target)
 
         return FiniteAutomaton(states, initial_state, final_states, alphabet, transitions)
@@ -154,7 +154,7 @@ class FiniteAutomatonDeterminizer():
                     target_set = finite_automaton.transition(state, symbol)
 
                     for state in target_set:
-                        target = target.union(epsilon_closure[state])
+                        target |= epsilon_closure[state]
 
                 if len(target) == 0:
                     continue
@@ -163,7 +163,7 @@ class FiniteAutomatonDeterminizer():
 
                 for state in target_state:
                     if state in finite_automaton.final_states:
-                        final_states = final_states.union({target_state})
+                        final_states |= {target_state}
 
                 if target_state not in states:
                     unprocessed_states.append(target_state)

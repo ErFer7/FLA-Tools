@@ -1,0 +1,13 @@
+S -> aA_1 | bB_0I | cC_1 | null
+A_0 -> aA_1 | bB_0I | cC_1
+A_1 -> aA_2 | bB_1I | cC_2
+A_2 -> aA_0 | bB_2I | cC_0 | a | c
+B_0P -> bB_0I | cC_1
+B_1P -> bB_1I | cC_2
+B_2P -> bB_2I | cC_0 | c
+B_0I -> bB_0P | b
+B_1I -> bB_1P
+B_2I -> bB_2P
+C_0 -> cC_1
+C_1 -> cC_2
+C_2 -> cC_0 | c

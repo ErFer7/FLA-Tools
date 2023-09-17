@@ -1,0 +1,6 @@
+S -> aA_I | bB_P | cC_I
+A_I -> aS | bB_I | cC_P | a | c
+B_I -> aS | cC_P | a | c
+B_P -> aA_I | cC_I
+C_I -> cC_P | c
+C_P -> cC_I

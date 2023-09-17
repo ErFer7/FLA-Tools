@@ -39,10 +39,11 @@ class Tests():
         Runs the tests.
         '''
 
-        print('Running tests')
+        print('Running tests\n')
 
         for i in range(1, 36):
             self.run(join('samples', f'list_{i}.txt'), lambda string: self.test_rule(string, i))
+            print()
 
     def run(self, grammar_file: str, test_rule: callable) -> None:
         '''
@@ -53,11 +54,15 @@ class Tests():
 
         strings = self.generate_strings(grammar_file)
 
+        passed = True
+
         for string in strings:
             if not test_rule(string):
+                passed = False
                 print(f'Failed for {string}')
 
-        print(f'{grammar_file} passed')
+        if passed:
+            print(f'{grammar_file} passed')
 
     def test_rule(self, string: str, index: int) -> bool:
         '''
@@ -124,7 +129,6 @@ class Tests():
 
                 return (string.count('a') + string.count('b')) % 3 == 0
             case 18:
-
                 b_state = False
                 c_state = False
 
@@ -139,6 +143,26 @@ class Tests():
                     elif char == 'c':
                         c_state = True
 
-                return string.count('a') + string.count('c') % 3 == 0 and string.count('b') % 2 == 0
+                return (string.count('a') + string.count('c')) % 3 == 0 and string.count('b') % 2 == 0
+            case 19:
+                c_state = False
+
+                for char in string:
+                    if char in ('a', 'b') and c_state:
+                        return False
+                    elif char == 'c':
+                        c_state = True
+
+                return (string.count('a') + string.count('c')) % 2 == 0 and 'bb' not in string
+            case 20:
+                b_state = False
+
+                for char in string:
+                    if char == 'a' and b_state:
+                        return False
+                    elif char == 'b':
+                        b_state = True
+
+                return (string.count('a') + string.count('b')) % 3 != 0 or string == ''
             case _:
                 return False

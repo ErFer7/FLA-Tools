@@ -122,7 +122,7 @@ class Tests():
                     elif char == 'b':
                         b_state = True
 
-                return string.count('a') + string.count('b') % 3 == 0
+                return (string.count('a') + string.count('b')) % 3 == 0
             case 18:
 
                 b_state = False

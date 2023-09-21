@@ -1,2 +1,3 @@
-# grammalyzer
-simple program to generate strings from a grammar.
+# FLA-Tools
+
+Simple program to manipulate NFAs, DFAs and grammars.

@@ -1,0 +1,7 @@
+S -> aA_1 | bB_1 | a | b | null
+A_0 -> aA_1 | bB_1 | a | b
+A_1 -> aA_2 | bB_2 | a | b
+A_2 -> aA_0 | bB_0
+B_0 -> bB_1 | b
+B_1 -> bB_2 | b
+B_2 -> bB_0

@@ -42,13 +42,13 @@ class Generator():
         return sorted(strings, key=len)
 
     @staticmethod
-    def proccess_branch_step(grammar: Grammar, string: str, call_depth: int, max_depth: int) -> list[str] | None:
+    def proccess_branch_step(grammar: Grammar, string: str, call_depth: int, max_depth: int) -> list[str]:
         '''
         Runs the generator.
         '''
 
         if call_depth > max_depth:
-            return None
+            return []
 
         possible_results, is_done = grammar.derive_branching_step(string)
 

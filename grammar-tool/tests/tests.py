@@ -4,6 +4,7 @@ First list.
 
 import sys
 from os.path import join
+from typing import Callable
 from source.generator import Generator
 from source.grammar import Grammar
 
@@ -45,7 +46,7 @@ class Tests():
             self.run(join('samples', f'list_{i}.txt'), lambda string: self.test_rule(string, i))
             print()
 
-    def run(self, grammar_file: str, test_rule: callable) -> None:
+    def run(self, grammar_file: str, test_rule: Callable[[str], bool]) -> None:
         '''
         Runs the tests.
         '''
@@ -164,5 +165,7 @@ class Tests():
                         b_state = True
 
                 return (string.count('a') + string.count('b')) % 3 != 0 or string == ''
+            case 21:
+                return len(string) % 2 == 0 and string.count('a') % 2 != 0 and 'aa' not in string and 'ac' not in string
             case _:
                 return False

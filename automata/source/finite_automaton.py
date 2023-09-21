@@ -308,7 +308,6 @@ class FiniteAutomatonMinimizer():
 
                         if equivalence_class in equivalence_classes_temp:
                             old_set_temp_index = equivalence_classes_temp.index(equivalence_class)
-
                             equivalence_classes_temp[old_set_temp_index:old_set_temp_index + 1] = [intersected_set, subtracted_set]
                         else:
                             if len(intersected_set) <= len(subtracted_set):

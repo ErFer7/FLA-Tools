@@ -304,14 +304,12 @@ class FiniteAutomatonMinimizer():
                         subtracted_set = equivalence_class - source_states
                         index += 1
 
-                        equivalence_classes[old_set_index] = intersected_set
-                        equivalence_classes.insert(old_set_index + 1, subtracted_set)
+                        equivalence_classes[old_set_index:old_set_index + 1] = [intersected_set, subtracted_set]
 
                         if equivalence_class in equivalence_classes_temp:
                             old_set_temp_index = equivalence_classes_temp.index(equivalence_class)
 
-                            equivalence_classes_temp[old_set_temp_index] = intersected_set
-                            equivalence_classes_temp.insert(old_set_temp_index, subtracted_set)
+                            equivalence_classes_temp[old_set_temp_index:old_set_temp_index + 1] = [intersected_set, subtracted_set]
                         else:
                             if len(intersected_set) <= len(subtracted_set):
                                 equivalence_classes_temp.append(intersected_set)

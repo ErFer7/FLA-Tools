@@ -134,6 +134,54 @@ class FiniteAutomatonBuilder():
 
         return FiniteAutomaton(states, initial_state, final_states, alphabet, transitions)
 
+    @staticmethod
+    def build(root_firstpos: set[int],
+              followpos: dict[int, set[int]],
+              symbols: set[str],
+              position_symbols: dict[int, str]) -> FiniteAutomaton:
+        '''
+        Constrói um autômato finito a partir de firstpos e followpos.
+        '''
+
+        print(root_firstpos)
+        print(followpos)
+        print(symbols)
+
+        initial_state = []
+        final_states = []
+        alphabet = set()
+        transitions = {}
+
+        d_states = {tuple(root_firstpos): False}
+
+        while True:
+            current_state = set()
+
+            for state, marked in d_states.items():
+                if not marked:
+                    d_states[state] = True
+                    current_state = state
+                    break
+            else:
+                break
+
+            for symbol in symbols:
+                target = set()
+
+                for position in current_state:
+                    if symbol == position_symbols[position]:
+                        target |= followpos[position]
+
+                if len(target) != 0 and tuple(target) not in d_states.keys():
+                    d_states[tuple(target)] = False
+
+                transitions.setdefault((tuple(current_state), symbol), set()).add(tuple(target))
+
+        for transition in transitions.items():
+            print(transition)
+
+        return FiniteAutomaton(d_states, initial_state, final_states, alphabet, transitions)
+
 
 class FiniteAutomatonDeterminizer():
 

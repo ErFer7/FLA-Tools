@@ -19,9 +19,9 @@ class ParseNode():
     _firstpos: set[int]
     _lastpos: set[int]
 
-    def __init__(self, value: str, left: Any, right: Any, index: int | None = None):
+    def __init__(self, value: str, left: Any, right: Any):
         self._value = value
-        self._index = index
+        self._index = None
         self._left = left
         self._right = right
         self._nullable = False
@@ -29,22 +29,22 @@ class ParseNode():
         self._lastpos = set()
 
     def __str__(self) -> str:
+        # Adaptado para https://mshang.ca/syntree/
+
         result = ''
 
+        firstpos_str = ','.join([str(position) for position in self._firstpos])
+        lastpos_str = ','.join([str(position) for position in self._lastpos])
+
+        result += f'[<{self._value}>-({self._nullable}/{firstpos_str}/{lastpos_str})'
+
         if self._left is not None:
-            result += f'({str(self._left)})-'
-
-        result += f'{self._value}['
-
-        if self._index is not None:
-            result += f'{self._index} / '
-
-        result += f'{self._nullable} / {self._firstpos} / {self._lastpos}]'
+            result += f' {str(self._left)}'
 
         if self._right is not None:
-            result += f'-({str(self._right)})'
+            result += f' {str(self._right)}'
 
-        return result
+        return result + ']'
 
     @property
     def nullable(self) -> bool:
@@ -69,6 +69,23 @@ class ParseNode():
         '''
 
         return self._lastpos
+
+    def calculate_index(self, index_counter: list[int], positions_symbols: dict[int, str]) -> None:
+        '''
+        Calcula o valor de index.
+        '''
+
+        if self._left is not None:
+            self._left.calculate_index(index_counter, positions_symbols)
+
+        if self._right is not None:
+            self._right.calculate_index(index_counter, positions_symbols)
+
+        if self._index is None:
+            if self._value not in ('*', '.', '|', '&'):
+                index_counter[0] += 1
+                self._index = index_counter[0]
+                positions_symbols[index_counter[0]] = self._value
 
     def calculate_nullable(self) -> None:
         '''
@@ -180,7 +197,6 @@ class ParseTree():
         self._root = None
         self._symbols = set()
         self._positions_symbols = {}
-        symbol_index = 0
 
         while len(postfixed_regex) > 1:
             index = 0
@@ -193,12 +209,9 @@ class ParseTree():
                         subnode = None
 
                         if postfixed_regex[index - 1] != '&':
-                            symbol_index += 1
                             self._symbols |= {postfixed_regex[index - 1]}
-                            self._positions_symbols[symbol_index] = postfixed_regex[index - 1]
-                            subnode = ParseNode(postfixed_regex[index - 1], None, None, symbol_index)  # type: ignore
-                        else:
-                            subnode = ParseNode(postfixed_regex[index - 1], None, None)  # type: ignore
+
+                        subnode = ParseNode(postfixed_regex[index - 1], None, None)  # type: ignore
 
                         self._root = ParseNode(postfixed_regex[index], subnode, None)  # type: ignore
 
@@ -214,46 +227,34 @@ class ParseTree():
                         subnode = None
 
                         if postfixed_regex[index - 1] != '&':
-                            symbol_index += 1
                             self._symbols |= {postfixed_regex[index - 1]}
-                            self._positions_symbols[symbol_index] = postfixed_regex[index - 1]
-                            subnode = ParseNode(postfixed_regex[index - 1], None, None, symbol_index)  # type: ignore
-                        else:
-                            subnode = ParseNode(postfixed_regex[index - 1], None, None)  # type: ignore
+
+                        subnode = ParseNode(postfixed_regex[index - 1], None, None)  # type: ignore
 
                         self._root = ParseNode(postfixed_regex[index], postfixed_regex[index - 2], subnode)  # type: ignore
                     elif isinstance(postfixed_regex[index - 1], ParseNode):
                         subnode = None
 
                         if postfixed_regex[index - 2] != '&':
-                            symbol_index += 1
                             self._symbols |= {postfixed_regex[index - 2]}
-                            self._positions_symbols[symbol_index] = postfixed_regex[index - 2]
-                            subnode = ParseNode(postfixed_regex[index - 2], None, None, symbol_index)  # type: ignore
-                        else:
-                            subnode = ParseNode(postfixed_regex[index - 2], None, None)  # type: ignore
+
+                        subnode = ParseNode(postfixed_regex[index - 2], None, None)  # type: ignore
 
                         self._root = ParseNode(postfixed_regex[index], subnode, postfixed_regex[index - 1])  # type: ignore
                     else:
                         left_subnode = None
 
                         if postfixed_regex[index - 2] != '&':
-                            symbol_index += 1
                             self._symbols |= {postfixed_regex[index - 2]}
-                            self._positions_symbols[symbol_index] = postfixed_regex[index - 2]
-                            left_subnode = ParseNode(postfixed_regex[index - 2], None, None, symbol_index)  # type: ignore
-                        else:
-                            left_subnode = ParseNode(postfixed_regex[index - 2], None, None)  # type: ignore
+
+                        left_subnode = ParseNode(postfixed_regex[index - 2], None, None)  # type: ignore
 
                         right_subnode = None
 
                         if postfixed_regex[index - 1] != '&':
-                            symbol_index += 1
                             self._symbols |= {postfixed_regex[index - 1]}
-                            self._positions_symbols[symbol_index] = postfixed_regex[index - 1]
-                            right_subnode = ParseNode(postfixed_regex[index - 1], None, None, symbol_index)  # type: ignore
-                        else:
-                            right_subnode = ParseNode(postfixed_regex[index - 1], None, None)  # type: ignore
+
+                        right_subnode = ParseNode(postfixed_regex[index - 1], None, None)  # type: ignore
 
                         self._root = ParseNode(postfixed_regex[index], left_subnode, right_subnode)  # type: ignore
 
@@ -268,7 +269,6 @@ class ParseTree():
                 index += 1
 
         self._symbols -= {'#'}
-        self._last_symbol_index = symbol_index
 
     def __str__(self) -> str:
         return str(self._root)
@@ -297,6 +297,25 @@ class ParseTree():
 
         return self._positions_symbols
 
+    @property
+    def last_symbol_index(self) -> int:
+        '''
+        Getter para last_symbol_index.
+        '''
+
+        return self._last_symbol_index
+
+    def calculate_index(self) -> None:
+        '''
+        Calcula os valores de index.
+        '''
+
+        index = [0]  # Wrapper mutável (Gambiarra)
+
+        self._root.calculate_index(index, self._positions_symbols)
+
+        self._last_symbol_index = index[0]
+
     def calculate_nullable(self) -> None:
         '''
         Calcula os valores de nullable.
@@ -323,11 +342,10 @@ class ParseTree():
         Calcula os valores de followpos.
         '''
 
+        self.calculate_index()
         self.calculate_nullable()
         self.calculate_firstpos()
         self.calculate_lastpos()
-
-        print(self)
 
         followpos = {index: set() for index in range(1, self._last_symbol_index + 1)}
 

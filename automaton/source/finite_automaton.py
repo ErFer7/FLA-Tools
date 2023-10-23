@@ -44,6 +44,16 @@ class FiniteAutomaton():
 
         return f'{len(self._states)};{self._initial_state};{final_states};{alphabet};{processed_transitions}'
 
+    def __eq__(self, __value: object) -> bool:
+        if not isinstance(__value, FiniteAutomaton):
+            return NotImplemented
+
+        return self._states == __value._states and \
+            self._initial_state == __value._initial_state and \
+            self._final_states == __value._final_states and \
+            self._alphabet == __value._alphabet and \
+            self._transitions == __value._transitions
+
     @property
     def initial_state(self) -> str:
         '''
@@ -135,23 +145,18 @@ class FiniteAutomatonBuilder():
         return FiniteAutomaton(states, initial_state, final_states, alphabet, transitions)
 
     @staticmethod
-    def build(root_firstpos: set[int],
-              followpos: dict[int, set[int]],
-              symbols: set[str],
-              position_symbols: dict[int, str]) -> FiniteAutomaton:
+    def build_from_followpos(root_firstpos: set[int],
+                             followpos: dict[int, set[int]],
+                             symbols: set[str],
+                             position_symbols: dict[int, str],
+                             last_symbol_index: int) -> FiniteAutomaton:
         '''
         Constrói um autômato finito a partir de firstpos e followpos.
         '''
 
-        print(root_firstpos)
-        print(followpos)
-        print(symbols)
+        raw_transitions = {}
 
-        initial_state = []
-        final_states = []
-        alphabet = set()
-        transitions = {}
-
+        initial_state = '{' + ','.join(map(str, sorted(root_firstpos))) + '}'
         d_states = {tuple(root_firstpos): False}
 
         while True:
@@ -175,12 +180,25 @@ class FiniteAutomatonBuilder():
                 if len(target) != 0 and tuple(target) not in d_states.keys():
                     d_states[tuple(target)] = False
 
-                transitions.setdefault((tuple(current_state), symbol), set()).add(tuple(target))
+                raw_transitions[(tuple(current_state), symbol)] = tuple(target)
 
-        for transition in transitions.items():
-            print(transition)
+        final_states = set()
 
-        return FiniteAutomaton(d_states, initial_state, final_states, alphabet, transitions)
+        for state in d_states:
+            if last_symbol_index in state:
+                final_states.add(state)
+
+        states = set(map(lambda x: '{' + ','.join(map(str, sorted(x))) + '}', d_states.keys()))
+        final_states = set(map(lambda x: '{' + ','.join(map(str, sorted(x))) + '}', final_states))
+
+        transitions = {}
+
+        for (source, symbol), target in raw_transitions.items():
+            if len(target) > 0:
+                transitions[('{' + ','.join(map(str, sorted(source))) + '}', symbol)
+                            ] = {'{' + ','.join(map(str, sorted(target))) + '}'}
+
+        return FiniteAutomaton(states, initial_state, final_states, symbols, transitions)
 
 
 class FiniteAutomatonDeterminizer():
@@ -356,7 +374,8 @@ class FiniteAutomatonMinimizer():
 
                         if equivalence_class in equivalence_classes_temp:
                             old_set_temp_index = equivalence_classes_temp.index(equivalence_class)
-                            equivalence_classes_temp[old_set_temp_index:old_set_temp_index + 1] = [intersected_set, subtracted_set]
+                            equivalence_classes_temp[old_set_temp_index:old_set_temp_index + 1] = [
+                                intersected_set, subtracted_set]
                         else:
                             if len(intersected_set) <= len(subtracted_set):
                                 equivalence_classes_temp.append(intersected_set)

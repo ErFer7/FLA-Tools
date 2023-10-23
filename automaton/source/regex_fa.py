@@ -18,14 +18,14 @@ class RegexToDFAConversor():
         Converte uma ER para um DFA.
         '''
 
-        new_regular_expression = regular_expression + '#'
+        new_regular_expression = f'({regular_expression})#'
         parse_tree = RegexToDFAConversor.parse(new_regular_expression)
         followpos = parse_tree.calculate_followpos()
 
-        return FiniteAutomatonBuilder.build(parse_tree.root.firstpos,
-                                            followpos, parse_tree.symbols,
-                                            parse_tree.positions_symbols)
-
+        return FiniteAutomatonBuilder.build_from_followpos(parse_tree.root.firstpos,
+                                                           followpos, parse_tree.symbols,
+                                                           parse_tree.positions_symbols,
+                                                           parse_tree.last_symbol_index)
 
     @staticmethod
     def parse(regular_expression: str) -> ParseTree:

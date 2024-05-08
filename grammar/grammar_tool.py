@@ -24,13 +24,13 @@ except (IndexError, ValueError) as error:
 
 if MODE == 'generate':
     try:
-        with open('samples/list_1.txt', 'r', encoding='utf-8') as file:
+        with open(FILENAME, 'r', encoding='utf-8') as file:
             grammar = Grammar(file.read())
     except (FileNotFoundError, KeyError, ValueError) as error:
         print(error)
         sys.exit(1)
 
-    strings = Generator.generate_branches(grammar, DEPTH)
+    strings = Generator.generate_random(grammar, DEPTH)
 
     for string in strings:
         print(string)
